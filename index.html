@@ -420,11 +420,11 @@
                 </div>
             </div>
 
-            <!-- Filters -->
+            <!-- Filters (UPDATED LABELS TO "Names") -->
             <div class="filters" id="filterContainer">
                 <button class="chip active" data-filter="all">Trending</button>
-                <button class="chip" data-filter="boy">Boys</button>
-                <button class="chip" data-filter="girl">Girls</button>
+                <button class="chip" data-filter="boy">Br Names</button>
+                <button class="chip" data-filter="girl">Cs Names</button>
                 <button class="chip" data-filter="symbols">Stylish</button>
             </div>
 
@@ -493,7 +493,7 @@
             '×͜×', '亗', '★', 'シ', '༒', '࿐', '✧', '♕', '☠'
         ];
 
-        // Fetch Data
+        // Fetch Data (REVERSE ARRAY SO NEWEST SHOWS FIRST)
         onValue(nicknamesRef, (snapshot) => {
             nicknamesDB = [];
             if (snapshot.exists()) {
@@ -505,6 +505,9 @@
                         tags: data.tags || []
                     });
                 });
+                
+                // Yeh line array ko ulta kar deti hai jisse latest data sabse upar aata hai
+                nicknamesDB.reverse();
             }
             isDataLoaded = true;
             filterData();
@@ -538,7 +541,7 @@
             return text.toLowerCase().split('').map(char => ninjaMap[char] || char).join('');
         }
 
-        // 🎲 Random Style Generation (UPDATED FOR DUMDUM FONT AT TOP)
+        // 🎲 Random Style Generation
         function generateRandomStyles(query, count = 10) {
             const formattedQuery = query.replace(/ /g, 'ㅤ');
             
@@ -549,7 +552,6 @@
                 { name: 'Ｄｕｍ', fn: convertToFullWidth }
             ];
             
-            // REMOVED "༺" FROM HERE
             const pairs = [
                 ["✨", "✨"], ["乂", "乂"], ["『", "』"], ["【", "】"],
                 ["★", "★"], ["", "ㅤツ"], ["", "ㅤ모"], ["", "ㅤ×͜×"], ["", "ㅤ亗"],
