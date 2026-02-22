@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B0B14">
+    <title>NickFinder Admin Panel</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #05050A;
+            --bg-app: #0B0B14;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A5B5;
+            
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-hover: rgba(255, 255, 255, 0.08);
+            
+            --btn-grad: linear-gradient(90deg, #A25BFE, #63E3FF);
+            --btn-danger: linear-gradient(90deg, #FF4B4B, #FF2E2E);
+            
+            --radius-md: 16px;
+            --radius-pill: 99px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Navbar */
+        .admin-nav {
+            background: rgba(11, 11, 20, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-nav h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--btn-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+        }
+
+        /* Card Styles */
+        .panel-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .panel-header {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        /* Form Inputs */
+        .input-group { margin-bottom: 1.2rem; }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            color: white;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #A25BFE;
+            box-shadow: 0 0 15px rgba(162, 91, 254, 0.2);
+        }
+
+        /* Tags Checkboxes */
+        .tags-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tag-checkbox:hover { background: var(--glass-hover); }
+
+        .tag-checkbox input {
+            accent-color: #A25BFE;
+            width: 16px; height: 16px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            background: var(--btn-grad);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* Data List Styles */
+        .search-bar { margin-bottom: 1.5rem; }
+        
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom Scrollbar */
+        .list-container::-webkit-scrollbar { width: 6px; }
+        .list-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        .list-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            transition: var(--transition-smooth);
+        }
+
+        .data-row:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .data-info h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+            color: white;
+            word-break: break-all;
+        }
+
+        .tag-badge {
+            font-size: 0.75rem;
+            background: rgba(162, 91, 254, 0.2);
+            color: #E2E8F0;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            margin-right: 5px;
+            border: 1px solid rgba(162, 91, 254, 0.3);
+        }
+
+        .btn-delete {
+            background: rgba(255, 75, 75, 0.1);
+            color: #FF4B4B;
+            border: 1px solid rgba(255, 75, 75, 0.3);
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #FF4B4B;
+            color: white;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 2.5rem; left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20, 20, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px); color: white;
+            padding: 1rem 1.5rem; border-radius: var(--radius-pill);
+            font-weight: 500; font-size: 0.95rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px;
+            transition: var(--transition-smooth); z-index: 1000; opacity: 0;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="admin-nav">
+        <h1>NickFinder Admin</h1>
+        <div style="color: var(--text-muted); font-size: 0.9rem;">
+            Database: <span style="color: #63E3FF;">Live</span>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-container">
+        
+        <!-- Add New Name Form -->
+        <section class="panel-card">
+            <h2 class="panel-header">Add Name / Symbol</h2>
+            <form id="addForm">
+                <div class="input-group">
+                    <label for="newName">Nickname or Symbol Text</label>
+                    <input type="text" id="newName" class="form-input" placeholder="e.g. 亗 ×͜× Ninja" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Assign Tags</label>
+                    <div class="tags-grid">
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="all" checked> Trending
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="boy"> Boy
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="girl"> Girl
+                        </label>
+                        <label class="tag-checkbox">
+                            <input type="checkbox" value="symbols"> Stylish/Symbol
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="addBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add to Database
+                </button>
+            </form>
+        </section>
+
+        <!-- Manage Database List -->
+        <section class="panel-card">
+            <h2 class="panel-header">Manage Database</h2>
+            
+            <div class="search-bar">
+                <input type="text" id="filterInput" class="form-input" placeholder="Search entries to delete...">
+            </div>
+
+            <div class="list-container" id="adminList">
+                <div class="empty-state">Loading database...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- App Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastMsg">Action successful!</span>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        // Firebase Modular SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // Firebase Configuration (Same as App)
+        const configGame = { 
+            apiKey: "AIzaSyCpVS-SVaIJI6DN8AqnoYslb1vujw8N1ds", 
+            authDomain: "game-cd989.firebaseapp.com", 
+            databaseURL: "https://game-cd989-default-rtdb.firebaseio.com", 
+            projectId: "game-cd989" 
+        };
+
+        const app = initializeApp(configGame);
+        const db = getDatabase(app);
+        const nicknamesRef = ref(db, 'nicknames');
+
+        let nicknamesDB = [];
+        const adminList = document.getElementById('adminList');
+        const filterInput = document.getElementById('filterInput');
+        const addForm = document.getElementById('addForm');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        const addBtn = document.getElementById('addBtn');
+
+        // Fetch Data Real-time
+        onValue(nicknamesRef, (snapshot) => {
+            nicknamesDB = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    nicknamesDB.push({
+                        id: childSnapshot.key,
+                        name: data.name,
+                        tags: data.tags || []
+                    });
+                });
+                // Reverse to show newest first
+                nicknamesDB.reverse();
+            }
+            renderAdminList();
+        });
+
+        // Render List & Search Filter
+        function renderAdminList() {
+            const query = filterInput.value.toLowerCase().trim();
+            adminList.innerHTML = '';
+
+            const filteredData = nicknamesDB.filter(item => 
+                item.name.toLowerCase().includes(query)
+            );
+
+            if (filteredData.length === 0) {
+                adminList.innerHTML = `<div class="empty-state">No entries found.</div>`;
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'data-row';
+                
+                // Create Tag badges
+                const tagsHtml = item.tags.map(tag => `<span class="tag-badge">${tag}</span>`).join('');
+
+                row.innerHTML = `
+                    <div class="data-info">
+                        <h3>${item.name}</h3>
+                        <div>${tagsHtml}</div>
+                    </div>
+                    <button class="btn-delete" data-id="${item.id}" title="Delete">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                `;
+
+                // Add Delete Event
+                const delBtn = row.querySelector('.btn-delete');
+                delBtn.addEventListener('click', () => deleteEntry(item.id, item.name));
+                
+                adminList.appendChild(row);
+            });
+        }
+
+        filterInput.addEventListener('input', renderAdminList);
+
+        // Add New Entry
+        addForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('newName').value.trim();
+            const checkedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked')).map(cb => cb.value);
+
+            if (!nameInput) return;
+
+            addBtn.disabled = true;
+            addBtn.innerHTML = 'Adding...';
+
+            try {
+                // Push to Firebase Realtime Database
+                await push(nicknamesRef, {
+                    name: nameInput,
+                    tags: checkedTags
+                });
+
+                showToast(`Added "${nameInput}" successfully!`);
+                addForm.reset();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                showToast("Error adding data!", true);
+            }
+
+            addBtn.disabled = false;
+            addBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add to Database
+            `;
+        });
+
+        // Delete Entry
+        async function deleteEntry(id, name) {
+            const confirmDelete = confirm(`Are you sure you want to delete "${name}"?`);
+            if (!confirmDelete) return;
+
+            try {
+                const itemRef = ref(db, `nicknames/${id}`);
+                await remove(itemRef);
+                showToast(`Deleted "${name}"`);
+            } catch (error) {
+                console.error("Error deleting document: ", error);
+                showToast("Error deleting data!", true);
+            }
+        }
+
+        // Toast UI
+        function showToast(message, isError = false) {
+            toastMsg.innerText = message;
+            toast.style.borderColor = isError ? "rgba(255, 75, 75, 0.5)" : "rgba(162, 91, 254, 0.5)";
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+    </script>
+</body>
+</html>
